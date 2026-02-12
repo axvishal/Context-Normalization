@@ -305,6 +305,36 @@ MIT License
 
 ---
 
+## ⚠️ Large files & Git LFS
+
+The repository currently contains a large CSV (`data/input.csv`) which is over GitHub's recommended size limit (50 MB). Large files in the Git history can cause push and clone issues. Recommended options:
+
+- Move large data files out of the repository and add them to `.gitignore`.
+- Use Git LFS to store large files instead of keeping them in the main Git history.
+
+If you want to track `data/input.csv` with Git LFS, run:
+
+```bash
+git lfs install
+git lfs track "data/input.csv"
+git add .gitattributes
+git add data/input.csv
+git commit -m "Move data/input.csv to Git LFS"
+git push origin main
+```
+
+If the large file is already committed and you want to remove it from history, consider using `git filter-repo` or the `bfg-repo-cleaner` to rewrite history and remove the blob. Rewriting history requires coordination with collaborators and a force-push:
+
+```bash
+# Example outline (use with caution)
+git clone --mirror <repo-url>
+cd <repo-name>.git
+git filter-repo --path data/input.csv --invert-paths
+git push --force
+```
+
+---
+
 # 🚫 `.gitignore` (IMPORTANT)
 
 Create **`.gitignore`** in root:
