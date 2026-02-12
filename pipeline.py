@@ -1,4 +1,5 @@
 import pandas as pd
+import sys
 from tqdm import tqdm
 
 from services.cleaner import clean_text
@@ -7,10 +8,32 @@ from services.pos_extractor import extract_keywords
 from services.bedrock_llm import simplify_hindi
 
 
+def get_row_range():
+    """
+    Allows:
+        python pipeline.py 100 1100
+    """
+    if len(sys.argv) == 3:
+        try:
+            start = int(sys.argv[1])
+            end = int(sys.argv[2])
+            return start, end
+        except ValueError:
+            return None, None
+    return None, None
+
+
 def main():
     print("🚀 Pipeline started")
 
+    start, end = get_row_range()
+
     df = pd.read_csv("data/input.csv")
+
+    # Apply slicing if provided
+    if start is not None and end is not None:
+        df = df[start:end]
+        print(f"⚡ Processing rows from {start} to {end}")
 
     df.columns = df.columns.str.strip().str.lower()
 
@@ -26,8 +49,7 @@ def main():
     texts = df[text_col].astype(str).str.strip()
     texts = texts[texts != ""]
 
-    print(f"🧾 Using column: {text_col}")
-    print(f"🧮 Total rows found: {len(texts)}")
+    print(f"🧮 Total rows to process: {len(texts)}")
 
     results = []
 
