@@ -11,7 +11,7 @@ An end-to-end solution for cleaning English text, translating it to Hindi using 
 - 📊 **CSV-based batch processing** - Handle thousands of rows efficiently
 - 🧹 **Intelligent text cleaning** - Remove noise and normalize input
 - 🌐 **English → Hindi translation** - Via Bhashini API (Government of India)
-- 🔍 **Keyword extraction** - Automatic POS tagging using spaCy NLP
+- 🔍 **Keyword extraction** - Extract meaningful nouns/adjectives/adverbs using spaCy NLP
 - 🤖 **AI-powered simplification** - Simplify complex Hindi using AWS Bedrock Claude
 - 🎯 **Auto-detection** - Automatically identifies text columns
 - ⚡ **Progress tracking** - Real-time progress bar with ETA
@@ -60,9 +60,9 @@ Input CSV → Clean Text → Translate (EN→HI) → Extract Keywords → Simpli
 1. **Load & Validate** - Read CSV and detect text column (`sentence` or `grievance_text`)
 2. **Clean Text** - Remove special characters, normalize whitespace
 3. **Translate** - Convert English text to Hindi using Bhashini API
-4. **Extract Keywords** - Identify nouns, verbs, adjectives, pronouns using spaCy
-5. **Simplify** - Use AWS Bedrock Claude to simplify complex Hindi terms
-6. **Export** - Save results to CSV with all intermediate outputs
+4. **Extract Keywords** - Identify nouns, adjectives, and adverbs using spaCy
+5. **Simplify** - Use AWS Bedrock Claude to map complex Hindi words to simpler alternatives
+6. **Export** - Save word-level mappings to CSV
 
 ---
 
@@ -165,15 +165,17 @@ The pipeline automatically detects the correct column.
 Results are saved to `data/output.csv` with the following structure:
 
 ```csv
-english,hindi_original,hindi_simplified,error
-"This is a sample sentence","यह एक नमूना वाक्य है","यह एक उदाहरण वाक्य है",
+english_word,hindi_word,simplified_hindi,error
+"extremely","अत्यधिक","बहुत",
 ```
 
 **Columns:**
-- `english` - Cleaned English text
-- `hindi_original` - Direct translation from Bhashini
-- `hindi_simplified` - Simplified version from AWS Bedrock
+- `english_word` - Keyword extracted from English
+- `hindi_word` - Matching word from the Hindi translation
+- `simplified_hindi` - Simplified Hindi substitute
 - `error` - Error message (if processing failed for that row)
+
+Each row represents a word-level mapping, not a full sentence rewrite.
 
 ---
 
@@ -186,7 +188,7 @@ Removes special characters, normalizes whitespace, and prepares text for process
 Integrates with Bhashini API for English to Hindi translation. Government-approved translation service.
 
 ### `services/pos_extractor.py`
-Uses spaCy's English model to extract keywords (nouns, verbs, adjectives, pronouns) for context-aware simplification.
+Uses spaCy's English model to extract keywords (nouns, adjectives, adverbs) for context-aware simplification.
 
 ### `services/bedrock_llm.py`
 Interfaces with AWS Bedrock (Claude) to simplify complex Hindi text while preserving meaning.
